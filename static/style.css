@@ -1,0 +1,216 @@
+/* --- 1. SETUP & VARIABLES --- */
+:root {
+    --bg-dark: #050505;
+    --glass-bg: rgba(20, 20, 20, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --primary: #6366f1; /* Indigo */
+    --accent: #a855f7;  /* Purple */
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --bubble-bot: rgba(255, 255, 255, 0.08);
+    --bubble-user: linear-gradient(135deg, #6366f1, #a855f7);
+}
+
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Outfit', sans-serif; /* High-end modern font */
+}
+
+body {
+    background-color: var(--bg-dark);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- 2. BACKGROUND GLOW ORBS (The "Expensive" Feel) --- */
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.5;
+}
+.orb-1 {
+    width: 300px; height: 300px;
+    background: var(--primary);
+    top: -50px; left: -50px;
+}
+.orb-2 {
+    width: 400px; height: 400px;
+    background: var(--accent);
+    bottom: -100px; right: -100px;
+}
+
+/* --- 3. MAIN APP CONTAINER (Glass Card) --- */
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    height: 90vh;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px); /* The Frosted Glass Effect */
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+}
+
+/* --- 4. HEADER --- */
+header.glass-header {
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.2);
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+}
+.brand-text h1 { font-size: 1.2rem; font-weight: 600; color: var(--text-main); }
+.brand-text .dot { color: var(--primary); }
+.brand-text p { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.5px; }
+
+/* Switch Style */
+.mode-switch-container { display: flex; align-items: center; gap: 8px; }
+.mode-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+.active-mode { color: var(--accent); }
+
+.toggle-switch {
+    position: relative; width: 44px; height: 24px;
+    display: inline-block;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 34px; transition: .4s;
+}
+.slider:before {
+    position: absolute; content: "";
+    height: 18px; width: 18px; left: 3px; bottom: 3px;
+    background-color: white; border-radius: 50%; transition: .4s;
+}
+input:checked + .slider { background-color: var(--accent); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+
+/* --- 5. CHAT AREA --- */
+.chat-area {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+/* Custom Scrollbar */
+.custom-scroll::-webkit-scrollbar { width: 5px; }
+.custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+/* Messages */
+.message { display: flex; align-items: flex-end; gap: 10px; max-width: 100%; }
+.message.user { flex-direction: row-reverse; }
+
+.avatar {
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+.message.user .avatar { background: var(--primary); color: white; }
+
+.bubble {
+    max-width: 75%;
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    color: var(--text-main);
+}
+.message.bot .bubble {
+    background: var(--bubble-bot);
+    border-bottom-left-radius: 4px;
+    border: 1px solid var(--glass-border);
+}
+.message.user .bubble {
+    background: var(--bubble-user);
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* Voice Button */
+.voice-btn {
+    background: none; border: none;
+    color: rgba(255,255,255,0.5);
+    margin-left: 10px; cursor: pointer;
+    transition: color 0.3s;
+}
+.voice-btn:hover { color: #fff; }
+
+/* Animations */
+.fade-in { animation: fadeIn 0.4s ease-out forwards; opacity: 0; transform: translateY(10px); }
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+
+/* --- 6. INPUT AREA --- */
+.input-glass-wrapper {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid var(--glass-border);
+}
+
+.input-box {
+    display: flex;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 5px;
+    transition: border 0.3s;
+}
+.input-box:focus-within { border-color: var(--primary); }
+
+#user-input {
+    flex: 1;
+    background: transparent; border: none;
+    padding: 12px 15px;
+    color: white; font-size: 1rem;
+    outline: none;
+}
+#send-btn {
+    background: var(--primary);
+    border: none;
+    width: 45px; height: 45px;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+    display: flex; align-items: center; justify-content: center;
+}
+#send-btn:hover { background: var(--accent); transform: scale(1.05); }
+
+.disclaimer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    opacity: 0.6;
+}

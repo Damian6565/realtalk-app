@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealTalk | Premium AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <div class="app-container">
+        <header class="glass-header">
+            <div class="brand">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>RealTalk<span class="dot">.</span>ai</h1>
+                    <p>Next-Gen Therapy Companion</p>
+                </div>
+            </div>
+
+            <div class="mode-switch-container">
+                <span class="mode-label">ENG</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="sheng-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="mode-label active-mode">SHENG</span>
+            </div>
+        </header>
+
+        <div id="chat-window" class="chat-area custom-scroll">
+            <div class="message bot fade-in">
+                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="bubble">
+                    <span class="msg-text">Hello. I'm RealTalk. I'm here to listen, hype you up, or just chat. How's your mental state today?</span>
+                    </div>
+            </div>
+        </div>
+
+        <div class="input-glass-wrapper">
+            <div class="input-box">
+                <input type="text" id="user-input" placeholder="Type something..." autocomplete="off">
+                <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+            <div class="disclaimer">Private & Secure. Zero Judgment.</div>
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const shengToggle = document.getElementById('sheng-toggle');
+        
+        let conversationHistory = [];
+
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', sender, 'fade-in');
+            
+            // 1. Create Avatar
+            const avatarDiv = document.createElement('div');
+            avatarDiv.classList.add('avatar');
+            // Pro Icons: User gets a User Icon, Bot gets a Robot Icon
+            avatarDiv.innerHTML = sender === 'bot' ? '<i class="fa-solid fa-robot"></i>' : '<i class="fa-solid fa-user"></i>';
+
+            // 2. Create Bubble
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.classList.add('bubble');
+
+            // Logic: Voice Button
+            const isSheng = shengToggle.checked;
+            
+            if (sender === 'bot' && !isSheng) {
+                const contentSpan = document.createElement('span');
+                contentSpan.classList.add('msg-text');
+                contentSpan.innerText = text;
+                
+                const speakBtn = document.createElement('button');
+                speakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>'; 
+                speakBtn.classList.add('voice-btn');
+                speakBtn.onclick = () => speakText(text);
+
+                bubbleDiv.appendChild(contentSpan);
+                bubbleDiv.appendChild(speakBtn);
+            } else {
+                const contentSpan = document.createElement('span');
+                contentSpan.classList.add('msg-text');
+                contentSpan.innerText = text;
+                bubbleDiv.appendChild(contentSpan);
+            }
+
+            // Assemble
+            if (sender === 'bot') {
+                msgDiv.appendChild(avatarDiv);
+                msgDiv.appendChild(bubbleDiv);
+            } else {
+                msgDiv.appendChild(bubbleDiv); // User bubble first
+                msgDiv.appendChild(avatarDiv); // User avatar last
+            }
+
+            chatWindow.appendChild(msgDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha"));
+            if (preferredVoice) utterance.voice = preferredVoice;
+            window.speechSynthesis.speak(utterance);
+        }
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            appendMessage(message, 'user');
+            conversationHistory.push({ role: "user", content: message });
+            userInput.value = '';
+
+            const isSheng = shengToggle.checked; 
+
+            try {
+                const response = await fetch('/get_response', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        history: conversationHistory,
+                        mode: isSheng ? 'sheng' : 'english'
+                    })
+                });
+                const data = await response.json();
+                
+                appendMessage(data.response, 'bot');
+                conversationHistory.push({ role: "assistant", content: data.response });
+
+            } catch (error) {
+                appendMessage("Connection error.", 'bot');
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
