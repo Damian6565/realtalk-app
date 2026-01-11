@@ -51,30 +51,12 @@
             </div>
             <div class="disclaimer">Private & Secure. Zero Judgment.</div>
         </div>
+
         <div class="credits">
             Created by <span class="creator-name">Damian Manthi</span> 🇰🇪
         </div>
-    </div> ```
 
-4.  Now, open `static/style.css` and add this at the bottom to make it look cool:
-
-```css
-/* --- CREDITS --- */
-.credits {
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    padding-bottom: 10px;
-    opacity: 0.8;
-}
-
-.creator-name {
-    color: var(--primary); /* Indigo color */
-    font-weight: 600;
-}
-    </div>
-
-    <script>
+    </div> <script>
         const chatWindow = document.getElementById('chat-window');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
@@ -96,7 +78,7 @@
             const bubbleDiv = document.createElement('div');
             bubbleDiv.classList.add('bubble');
 
-            // Logic: Voice Button
+            // Logic: Voice Button (Only show if Bot AND NOT Sheng)
             const isSheng = shengToggle.checked;
             
             if (sender === 'bot' && !isSheng) {
@@ -107,18 +89,20 @@
                 const speakBtn = document.createElement('button');
                 speakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>'; 
                 speakBtn.classList.add('voice-btn');
+                speakBtn.title = "Listen";
                 speakBtn.onclick = () => speakText(text);
 
                 bubbleDiv.appendChild(contentSpan);
                 bubbleDiv.appendChild(speakBtn);
             } else {
+                // Regular text for User or Sheng mode
                 const contentSpan = document.createElement('span');
                 contentSpan.classList.add('msg-text');
                 contentSpan.innerText = text;
                 bubbleDiv.appendChild(contentSpan);
             }
 
-            // Assemble
+            // Assemble the message
             if (sender === 'bot') {
                 msgDiv.appendChild(avatarDiv);
                 msgDiv.appendChild(bubbleDiv);
@@ -131,14 +115,29 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
+        // --- VOICE FUNCTION ---
         function speakText(text) {
-            window.speechSynthesis.cancel();
+            window.speechSynthesis.cancel(); // Stop any current speech
             const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Get voices and try to find a decent English one
             const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha"));
+            const preferredVoice = voices.find(v => 
+                v.name.includes("Google US English") || 
+                v.name.includes("Samantha") || 
+                v.name.includes("Zira")
+            );
+            
             if (preferredVoice) utterance.voice = preferredVoice;
+            
+            // Tweak slightly for better flow
+            utterance.rate = 1; 
+            utterance.pitch = 1;
+
             window.speechSynthesis.speak(utterance);
         }
+
+        // Chrome Bug Fix: Load voices immediately
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
         async function sendMessage() {
@@ -166,7 +165,7 @@
                 conversationHistory.push({ role: "assistant", content: data.response });
 
             } catch (error) {
-                appendMessage("Connection error.", 'bot');
+                appendMessage("Connection error. Please try again.", 'bot');
             }
         }
 
