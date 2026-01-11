@@ -214,3 +214,22 @@ input:checked + .slider:before { transform: translateX(20px); }
     margin-top: 10px;
     opacity: 0.6;
 }
+
+/* --- 7. UPDATED FOOTER CREDITS --- */
+.credits {
+    width: 100%;                 /* Forces it to span edge-to-edge for perfect centering */
+    text-align: center;          /* Centers the text inside */
+    font-size: 0.75rem;
+    color: #FFFDD0;              /* Creamy Color (instead of grey) */
+    padding-top: 15px;
+    padding-bottom: 15px;
+    opacity: 0.9;                /* Brighter visibility */
+    letter-spacing: 0.5px;       /* Adds a bit of 'expensive' spacing */
+    text-shadow: 0 0 10px rgba(255, 253, 208, 0.2); /* Subtle glow */
+}
+
+.creator-name {
+    color: #ffffff;              /* Pure white for your name */
+    font-weight: 600;
+    text-shadow: 0 0 12px rgba(99, 102, 241, 0.6); /* Small purple glow on your name */
+}
